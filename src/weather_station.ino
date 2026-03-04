@@ -13,14 +13,14 @@
 #include "draw.h"
 
 #define ENABLE_GxEPD2_GFX 0
-#define CS_PIN   (5)
-#define DC_PIN   (6)
-#define RST_PIN  (8)
+#define CS_PIN (5)
+#define DC_PIN (6)
+#define RST_PIN (8)
 #define BUSY_PIN (15)
 
 const int defaultTimeSleepM = 60;
 const int errorSleepTimeM = 10;
-const int nightSleepTimeM = 480; // 8 hours
+const int nightSleepTimeM = 480;  // 8 hours
 
 const char* ssid = "WIFI_SSID";
 const char* password = "WIFI_PASSWORD";
@@ -51,38 +51,36 @@ String usdBrlData;
 
 GxEPD2_3C<GxEPD2_213_Z98c, GxEPD2_213_Z98c::HEIGHT> display(GxEPD2_213_Z98c(CS_PIN, DC_PIN, RST_PIN, BUSY_PIN));
 
-void setup()
-{
+void setup() {
   // Starts
   Serial.begin(115200);
-  while(!Serial);
+  while (!Serial);
   Serial.println("Starting...");
 
   nextSleepTimeM = defaultTimeSleepM;
 
   // Connects to Wifi and initialize display
-  connectAndSync();  
+  connectAndSync();
   SPI.begin(12, -1, 11, CS_PIN);
   display.init(115200);
-  
+
   // Query and show Data
   queryData();
   draw();
-  
+
   Serial.println("Done");
 
   // Goes to sleep for next cycle
-  Serial.println("Sleeping for: " + (String) nextSleepTimeM + " minutes");
+  Serial.println("Sleeping for: " + (String)nextSleepTimeM + " minutes");
   uint64_t sleepTimeUs = (uint64_t)nextSleepTimeM * 60ULL * 1000000ULL;
   esp_sleep_enable_timer_wakeup(sleepTimeUs);
   esp_deep_sleep_start();
 }
 
-void connectAndSync()
-{
+void connectAndSync() {
   WiFi.begin(ssid, password);
   Serial.println("Connecting");
-  const int maxWifiRetries = 20;   // 20 x 500ms = ~10 seconds
+  const int maxWifiRetries = 20;  // 20 x 500ms = ~10 seconds
   int wifiRetries = 0;
   while (WiFi.status() != WL_CONNECTED && wifiRetries < maxWifiRetries) {
     delay(500);
@@ -100,14 +98,14 @@ void connectAndSync()
     currentData.icon = "-1f";
     return;
   }
-  
+
   Serial.println("");
   Serial.println("Connected to WiFi!");
 
-  configTime(gmtOffset_sec, 0, ntpServer); // no daylight on Brazil
+  configTime(gmtOffset_sec, 0, ntpServer);  // no daylight on Brazil
   struct tm timeInfo;
 
-  Serial.println("Syncing time");  
+  Serial.println("Syncing time");
   while (!getLocalTime(&timeInfo)) {
     Serial.print(".");
     delay(500);
@@ -120,9 +118,8 @@ void connectAndSync()
   lastUpdateTime = String(currentTimeBuffer);
 }
 
-void queryData()
-{
-  if(WiFi.status() == WL_CONNECTED) {
+void queryData() {
+  if (WiFi.status() == WL_CONNECTED) {
     String fullWeatherUri = String(weatherUri) + openWeatherAPIKey;
     weatherBuffer = httpGETRequest(openWeatherServerName, fullWeatherUri.c_str());
     Serial.println("Successfully queried weather data");
@@ -142,12 +139,12 @@ void queryData()
 
     parseForecast(forecastBuffer, forecastData, 4);
     if (!forecastData[0].valid) {
-      for (int i = 0; i<4; i++) {
+      for (int i = 0; i < 4; i++) {
         forecastData[i].temp = "--";
       }
       nextSleepTimeM = errorSleepTimeM;
     }
-    
+
     String fullUsdBrlUri = String(usdBrlUri) + unirateAPIKey;
     String usdBrlBuffer = httpGETRequest(unirateServerName, fullUsdBrlUri.c_str());
     Serial.println("Sucessfully queried USD<>BRL data");
@@ -156,9 +153,9 @@ void queryData()
     if (JSON.typeof(usdBrlRoot) == "undefined")
       return;
     char usdBrlstrBuffer[20];
-    snprintf(usdBrlstrBuffer, sizeof(usdBrlstrBuffer), "%.3f", (double) usdBrlRoot["rate"]);
+    snprintf(usdBrlstrBuffer, sizeof(usdBrlstrBuffer), "%.3f", (double)usdBrlRoot["rate"]);
     usdBrlData = String(usdBrlstrBuffer);
-    if(usdBrlData == "nan") {
+    if (usdBrlData == "nan") {
       usdBrlData = "-.--";
       nextSleepTimeM = errorSleepTimeM;
     }
@@ -167,27 +164,23 @@ void queryData()
   }
 }
 
-void draw()
-{
+void draw() {
   display.setRotation(3);
   display.setTextColor(GxEPD_BLACK);
   display.setFullWindow();
   display.firstPage();
 
-  do
-  {    
+  do {
     drawLayout();
     drawData();
-  }
-  while (display.nextPage());
+  } while (display.nextPage());
 }
 
-void drawLayout()
-{
-  // --- Top header line --- 
+void drawLayout() {
+  // --- Top header line ---
   display.drawLine(0, 15, 150, 15, GxEPD_BLACK);
 
-  //--- exchange box --- 
+  //--- exchange box ---
   //top
   display.drawLine(150, 0, 250, 0, GxEPD_BLACK);
   //right
@@ -197,7 +190,7 @@ void drawLayout()
   //left
   display.drawLine(150, 0, 150, 60, GxEPD_BLACK);
 
-  //--- forecast box --- 
+  //--- forecast box ---
   // top
   display.drawLine(0, 68, 197, 68, GxEPD_BLACK);
   // bottom
@@ -205,17 +198,16 @@ void drawLayout()
   // left
   display.drawLine(0, 68, 0, 122, GxEPD_BLACK);
   // Vertical dividers between forecast items
-  for (int i=0; i<4; i++) {
-    int x = (50 * (i+1)) - 28;
+  for (int i = 0; i < 4; i++) {
+    int x = (50 * (i + 1)) - 28;
     display.drawLine(x + 25, 68, x + 25, 122, GxEPD_BLACK);
   }
-  
+
   //--- Icon bottom right ---
   DisplayLogo(200, 71);
 }
 
-void drawData()
-{
+void drawData() {
   // header
   DisplayText(5, 6, lastUpdateTime, &FreeSansBold8pt7b);
 
@@ -224,11 +216,11 @@ void drawData()
   DisplayWXicon(110, 44, currentData.icon, true);
 
   // forecast items
-  for (int i=0; i<4; i++) {
-    int x = (50 * (i+1)) - 28;
+  for (int i = 0; i < 4; i++) {
+    int x = (50 * (i + 1)) - 28;
     DisplayCenteredText(x, 77, forecastData[i].dateTime, &FreeSansBold8pt7b);
     DisplayWXicon(x, 97, forecastData[i].icon, false);
-    DisplayTemperature(x-5, 113, forecastData[i].temp, &FreeSansBold8pt7b, false);
+    DisplayTemperature(x - 5, 113, forecastData[i].temp, &FreeSansBold8pt7b, false);
   }
 
   // USD exchange rates
@@ -236,24 +228,22 @@ void drawData()
   DisplayCenteredText(200, 40, usdBrlData, &FreeSansBold12pt7b);
 }
 
-String httpGETRequest(const char* serverName, const char* uri)
-{
+String httpGETRequest(const char* serverName, const char* uri) {
   WiFiClient client;
   HTTPClient http;
 
   http.begin(client, serverName, 80, uri);
   int httpResponseCode = http.GET();
-  String payload = "{}";   
-  if (httpResponseCode>0) {
+  String payload = "{}";
+  if (httpResponseCode > 0) {
     Serial.print("HTTP Response code: ");
     Serial.println(httpResponseCode);
     payload = http.getString();
-  }
-  else {
+  } else {
     Serial.print("Error code: ");
     Serial.println(httpResponseCode);
   }
-  
+
   // Free resources
   http.end();
 

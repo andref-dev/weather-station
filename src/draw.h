@@ -1,5 +1,5 @@
-#define Large (7)    // For best results use odd numbers
-#define Small (3)    // For best results use odd numbers
+#define Large (7)  // For best results use odd numbers
+#define Small (3)  // For best results use odd numbers
 
 extern GxEPD2_3C<GxEPD2_213_Z98c, GxEPD2_213_Z98c::HEIGHT> display;
 
@@ -7,31 +7,36 @@ bool LargeIcon = true, SmallIcon = false;
 
 // Initially moved from this repo:
 // https://github.com/G6EJD/ESP32-e-Paper-Weather-Display/blob/master/examples/Waveshare_2_13_T5/Waveshare_2_13_T5.ino
-// But then changed upon with new moon icon, differecens on how the moon is handled, overall code cleanup, and non ADA GFX font rendering
+// But then changed upon with:
+// - new moon icon
+// - differecens on how the moon is handled
+// - overall code cleanup
+// - non ADA GFX font rendering
 
 //#########################################################################################
 // Symbols are drawn on a relative 10x10grid and 1 scale unit = 1 drawing unit
 void addcloud(int x, int y, int scale, int linesize) {
   //Draw cloud outer
-  display.fillCircle(x - scale * 3, y, scale, GxEPD_BLACK);                // Left most circle
-  display.fillCircle(x + scale * 3, y, scale, GxEPD_BLACK);                // Right most circle
-  display.fillCircle(x - scale, y - scale, scale * 1.4, GxEPD_BLACK);    // left middle upper circle
-  display.fillCircle(x + scale * 1.5, y - scale * 1.3, scale * 1.75, GxEPD_BLACK); // Right middle upper circle
-  display.fillRect(x - scale * 3 - 1, y - scale, scale * 6, scale * 2 + 1, GxEPD_BLACK); // Upper and lower lines
+  display.fillCircle(x - scale * 3, y, scale, GxEPD_BLACK);                               // Left most circle
+  display.fillCircle(x + scale * 3, y, scale, GxEPD_BLACK);                               // Right most circle
+  display.fillCircle(x - scale, y - scale, scale * 1.4, GxEPD_BLACK);                     // left middle upper circle
+  display.fillCircle(x + scale * 1.5, y - scale * 1.3, scale * 1.75, GxEPD_BLACK);        // Right middle upper circle
+  display.fillRect(x - scale * 3 - 1, y - scale, scale * 6, scale * 2 + 1, GxEPD_BLACK);  // Upper and lower lines
   //Clear cloud inner
-  display.fillCircle(x - scale * 3, y, scale - linesize, GxEPD_WHITE);            // Clear left most circle
-  display.fillCircle(x + scale * 3, y, scale - linesize, GxEPD_WHITE);            // Clear right most circle
-  display.fillCircle(x - scale, y - scale, scale * 1.4 - linesize, GxEPD_WHITE);  // left middle upper circle
-  display.fillCircle(x + scale * 1.5, y - scale * 1.3, scale * 1.75 - linesize, GxEPD_WHITE); // Right middle upper circle
-  display.fillRect(x - scale * 3 + 2, y - scale + linesize - 1, scale * 5.9, scale * 2 - linesize * 2 + 2, GxEPD_WHITE); // Upper and lower lines
+  display.fillCircle(x - scale * 3, y, scale - linesize, GxEPD_WHITE);                                                    // Clear left most circle
+  display.fillCircle(x + scale * 3, y, scale - linesize, GxEPD_WHITE);                                                    // Clear right most circle
+  display.fillCircle(x - scale, y - scale, scale * 1.4 - linesize, GxEPD_WHITE);                                          // left middle upper circle
+  display.fillCircle(x + scale * 1.5, y - scale * 1.3, scale * 1.75 - linesize, GxEPD_WHITE);                             // Right middle upper circle
+  display.fillRect(x - scale * 3 + 2, y - scale + linesize - 1, scale * 5.9, scale * 2 - linesize * 2 + 2, GxEPD_WHITE);  // Upper and lower lines
 }
 //#########################################################################################
 void addraindrop(int x, int y, int scale) {
   display.fillCircle(x, y, scale / 2, GxEPD_BLACK);
-  display.fillTriangle(x - scale / 2, y, x, y - scale * 1.2, x + scale / 2, y , GxEPD_BLACK);
-  x = x + scale * 1.6; y = y + scale / 3;
+  display.fillTriangle(x - scale / 2, y, x, y - scale * 1.2, x + scale / 2, y, GxEPD_BLACK);
+  x = x + scale * 1.6;
+  y = y + scale / 3;
   display.fillCircle(x, y, scale / 2, GxEPD_BLACK);
-  display.fillTriangle(x - scale / 2, y, x, y - scale * 1.2, x + scale / 2, y , GxEPD_BLACK);
+  display.fillTriangle(x - scale / 2, y, x, y - scale * 1.2, x + scale / 2, y, GxEPD_BLACK);
 }
 //#########################################################################################
 void addrain(int x, int y, int scale, bool IconSize) {
@@ -45,8 +50,10 @@ void addsnow(int x, int y, int scale, bool IconSize) {
   int dxo, dyo, dxi, dyi;
   for (int flakes = 0; flakes < 5; flakes++) {
     for (int i = 0; i < 360; i = i + 45) {
-      dxo = 0.5 * scale * cos((i - 90) * 3.14 / 180); dxi = dxo * 0.1;
-      dyo = 0.5 * scale * sin((i - 90) * 3.14 / 180); dyi = dyo * 0.1;
+      dxo = 0.5 * scale * cos((i - 90) * 3.14 / 180);
+      dxi = dxo * 0.1;
+      dyo = 0.5 * scale * sin((i - 90) * 3.14 / 180);
+      dyi = dyo * 0.1;
       display.drawLine(dxo + x + flakes * 1.5 * scale - scale * 3, dyo + y + scale * 2, dxi + x + 0 + flakes * 1.5 * scale - scale * 3, dyi + y + scale * 2, GxEPD_BLACK);
     }
   }
@@ -97,7 +104,6 @@ void addmoon(int x, int y, int scale, bool IconSize) {
   if (IconSize == SmallIcon) {
     display.fillCircle(x, y, scale * 2, GxEPD_WHITE);
     display.drawCircle(x, y, scale * 2 + 1, GxEPD_BLACK);
-    // display.drawCircle(x, y, scale + 2, GxEPD_BLACK);
     return;
   }
 
@@ -105,7 +111,7 @@ void addmoon(int x, int y, int scale, bool IconSize) {
   int moonScale = scale * 1.5;
   display.fillCircle(x, y, moonScale, GxEPD_BLACK);
   int offset = scale * 0.45;
-  display.fillCircle(x + offset, y - offset, moonScale, GxEPD_WHITE);  
+  display.fillCircle(x + offset, y - offset, moonScale, GxEPD_WHITE);
   display.drawCircle(x, y, moonScale + 1, GxEPD_BLACK);
   display.drawCircle(x, y, moonScale + 2, GxEPD_BLACK);
 }
@@ -126,9 +132,9 @@ void Sunny(int x, int y, bool IconSize, String IconName) {
   int scale = Small;
   if (IconSize == LargeIcon) {
     scale = Large;
-    y = y - 4; // Shift up large icon
+    y = y - 4;  // Shift up large icon
   } else {
-    y = y + 2; // Shift down small icon
+    y = y + 2;  // Shift down small icon
   }
   scale = scale * 1.6;
   if (IconName.endsWith("n")) {
@@ -150,7 +156,7 @@ void MostlySunny(int x, int y, bool IconSize, String IconName) {
     addmoon(x - scale * 1.8, y - scale * 1.8, scale, IconSize);
   } else {
     addsun(x - scale * 1.8, y - scale * 1.8, scale, IconSize);
-  }    
+  }
 }
 //#########################################################################################
 void MostlyCloudy(int x, int y, bool IconSize, String IconName) {
@@ -164,7 +170,7 @@ void MostlyCloudy(int x, int y, bool IconSize, String IconName) {
     addmoon(x - scale * 1.8, y - scale * 1.8, scale, IconSize);
   } else {
     addsun(x - scale * 1.8, y - scale * 1.8, scale, IconSize);
-  }  
+  }
   addcloud(x, y, scale, linesize);
 }
 //#########################################################################################
@@ -174,12 +180,11 @@ void Cloudy(int x, int y, bool IconSize, String IconName) {
     scale = Small;
     linesize = 1;
     addcloud(x, y, scale, linesize);
-  }
-  else {
+  } else {
     y += 12;
-    addcloud(x + 10, y - 20, 5, linesize); // Cloud top right
-    addcloud(x - 10, y - 10, 5, linesize); // Cloud top left
-    addcloud(x, y, scale, linesize);       // Main cloud
+    addcloud(x + 10, y - 20, 5, linesize);  // Cloud top right
+    addcloud(x - 10, y - 10, 5, linesize);  // Cloud top left
+    addcloud(x, y, scale, linesize);        // Main cloud
   }
 }
 //#########################################################################################
@@ -243,27 +248,24 @@ void Mist(int x, int y, bool IconSize, String IconName) {
   addfog(x, y - 2, scale, linesize, IconSize);
 }
 //#########################################################################################
-void NoWiFi(int x, int y)
-{
+void NoWiFi(int x, int y) {
   int lineSize = 3;
   int scale = Large;
   y += 10;
-  
+
   // x, y = center bottom (dot position)
   // scale = overall size multiplier
   const int thickness = scale * 0.8;  // arc thickness
-  const int spacing   = scale * 1.5;  // distance between arcs
+  const int spacing = scale * 1.5;    // distance between arcs
 
   const float startAngle = 225.0;
-  const float endAngle   = 315.0;
+  const float endAngle = 315.0;
 
-  for (int band = 1; band <= 3; band++)
-  {
+  for (int band = 1; band <= 3; band++) {
     int rOuter = band * spacing;
     int rInner = rOuter - thickness;
 
-    for (float angle = startAngle; angle <= endAngle; angle += 1.5)
-    {
+    for (float angle = startAngle; angle <= endAngle; angle += 1.5) {
       float rad = angle * DEG_TO_RAD;
 
       int xOuter = x + cos(rad) * rOuter;
@@ -282,57 +284,52 @@ void NoWiFi(int x, int y)
   // ===== FAILURE STRIKE LINE =====
   int size = scale * 3;
   y -= 10;
-  for (int  i = -5; i < 5; i++)
-  {
-    display.drawLine(x - size + (i*0.5), y - size - (i*0.5),
-                   x + size + (i*0.5), y + size - 10 - (i*0.5),
-                   GxEPD_RED);
+  for (int i = -5; i < 5; i++) {
+    display.drawLine(x - size + (i * 0.5), y - size - (i * 0.5),
+                     x + size + (i * 0.5), y + size - 10 - (i * 0.5),
+                     GxEPD_RED);
   }
 }
 
 void DisplayWXicon(int x, int y, String IconName, bool IconSize) {
-  if      (IconName == "01d" || IconName == "01n")  Sunny(x, y, IconSize, IconName);
-  else if (IconName == "02d" || IconName == "02n")  MostlySunny(x, y, IconSize, IconName);
-  else if (IconName == "03d" || IconName == "03n")  Cloudy(x, y, IconSize, IconName);
-  else if (IconName == "04d" || IconName == "04n")  MostlyCloudy(x, y, IconSize, IconName);
-  else if (IconName == "09d" || IconName == "09n")  ChanceRain(x, y, IconSize, IconName);
-  else if (IconName == "10d" || IconName == "10n")  Rain(x, y, IconSize, IconName);
-  else if (IconName == "11d" || IconName == "11n")  Tstorms(x, y, IconSize, IconName);
-  else if (IconName == "13d" || IconName == "13n")  Snow(x, y, IconSize, IconName);
-  else if (IconName == "50d" || IconName == "50n")  Mist(x, y, IconSize, IconName);
-  else if (IconName == "-1f" )                      NoWiFi(x, y);
+  if (IconName == "01d" || IconName == "01n") Sunny(x, y, IconSize, IconName);
+  else if (IconName == "02d" || IconName == "02n") MostlySunny(x, y, IconSize, IconName);
+  else if (IconName == "03d" || IconName == "03n") Cloudy(x, y, IconSize, IconName);
+  else if (IconName == "04d" || IconName == "04n") MostlyCloudy(x, y, IconSize, IconName);
+  else if (IconName == "09d" || IconName == "09n") ChanceRain(x, y, IconSize, IconName);
+  else if (IconName == "10d" || IconName == "10n") Rain(x, y, IconSize, IconName);
+  else if (IconName == "11d" || IconName == "11n") Tstorms(x, y, IconSize, IconName);
+  else if (IconName == "13d" || IconName == "13n") Snow(x, y, IconSize, IconName);
+  else if (IconName == "50d" || IconName == "50n") Mist(x, y, IconSize, IconName);
+  else if (IconName == "-1f") NoWiFi(x, y);
 }
 
-void DrawText(int x, int y, String text, const GFXfont* font, bool centerAlign)
-{
-    display.setFont(font);
+void DrawText(int x, int y, String text, const GFXfont* font, bool centerAlign) {
+  display.setFont(font);
 
-    int16_t x1, y1;
-    uint16_t w, h;
-    display.getTextBounds(text, 0, 0, &x1, &y1, &w, &h);
+  int16_t x1, y1;
+  uint16_t w, h;
+  display.getTextBounds(text, 0, 0, &x1, &y1, &w, &h);
 
-    int16_t cursorX = x;
-    int16_t cursorY = y + h / 2;
+  int16_t cursorX = x;
+  int16_t cursorY = y + h / 2;
 
-    if (centerAlign)
-        cursorX = x - w / 2;
+  if (centerAlign)
+    cursorX = x - w / 2;
 
-    display.setCursor(cursorX, cursorY);
-    display.print(text);
+  display.setCursor(cursorX, cursorY);
+  display.print(text);
 }
 
-void DisplayText(int x, int y, String text, const GFXfont* font)
-{
-    DrawText(x, y, text, font, false);
+void DisplayText(int x, int y, String text, const GFXfont* font) {
+  DrawText(x, y, text, font, false);
 }
 
-void DisplayCenteredText(int x, int y, String text, const GFXfont* font)
-{
-    DrawText(x, y, text, font, true);
+void DisplayCenteredText(int x, int y, String text, const GFXfont* font) {
+  DrawText(x, y, text, font, true);
 }
 
-void DisplayTemperature(int x, int y, String temp, const GFXfont* font, bool bigFont)
-{
+void DisplayTemperature(int x, int y, String temp, const GFXfont* font, bool bigFont) {
   DisplayCenteredText(x, y, temp, font);
 
   int16_t x1, y1;
@@ -342,48 +339,47 @@ void DisplayTemperature(int x, int y, String temp, const GFXfont* font, bool big
   // Adjust degree symbol size and position based on font
   int radius, offsetX, offsetY;
   if (bigFont) {
-      radius  = 5;          // bigger circle for large font
-      offsetX = 10;         // horizontal spacing from number
-      offsetY = h / 2 - 4;  // vertical offset above baseline
+    radius = 5;           // bigger circle for large font
+    offsetX = 10;         // horizontal spacing from number
+    offsetY = h / 2 - 4;  // vertical offset above baseline
   } else {
-      radius  = 2;          // small circle
-      offsetX = 6;
-      offsetY = h / 2 - 2;
+    radius = 2;  // small circle
+    offsetX = 6;
+    offsetY = h / 2 - 2;
   }
 
-  int degX = x + w/2 + offsetX;   // right of number
-  int degY = y - offsetY;         // slightly above number
+  int degX = x + w / 2 + offsetX;  // right of number
+  int degY = y - offsetY;          // slightly above number
 
   display.drawCircle(degX, degY, radius, GxEPD_BLACK);
-  if (bigFont) display.drawCircle(degX, degY, radius-1, GxEPD_BLACK);
+  if (bigFont) display.drawCircle(degX, degY, radius - 1, GxEPD_BLACK);
 }
 
-void DisplayLogo(int x, int y)
-{
+void DisplayLogo(int x, int y) {
   // 'weather_$tation_logo', 60x60px
-  const unsigned char epd_bitmap_logo [] PROGMEM = {    
-    0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 
-	0x00, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0xe0, 0x00, 0x00, 0x00, 0x00, 0x04, 0x01, 0xe0, 
-	0x0c, 0x00, 0x00, 0x00, 0x07, 0x03, 0xf0, 0x3c, 0x00, 0x00, 0x00, 0x07, 0x83, 0xf8, 0x7c, 0x00, 
-	0x00, 0x00, 0x07, 0xc0, 0x00, 0xfc, 0x00, 0x00, 0x00, 0x07, 0x80, 0x00, 0x7c, 0x00, 0x00, 0x00, 
-	0x06, 0x00, 0x00, 0x1c, 0x00, 0x00, 0x00, 0x00, 0x1f, 0xfe, 0x04, 0x00, 0x00, 0x00, 0x00, 0x3f, 
-	0xff, 0x80, 0x00, 0x00, 0x00, 0x00, 0xff, 0x1f, 0xe0, 0x00, 0x00, 0x0f, 0xc3, 0xff, 0x1f, 0xf0, 
-	0xfc, 0x00, 0x07, 0xc7, 0xc0, 0x00, 0x38, 0xf8, 0x00, 0x07, 0x87, 0xc0, 0x00, 0x3c, 0x78, 0x00, 
-	0x03, 0x8f, 0x80, 0x00, 0x3c, 0x38, 0x00, 0x01, 0x0f, 0x00, 0x00, 0x3e, 0x30, 0x00, 0x00, 0x1e, 
-	0x00, 0x00, 0x3e, 0x00, 0x00, 0x00, 0x3e, 0x07, 0x3f, 0xff, 0x00, 0x00, 0x00, 0x3e, 0x07, 0x3f, 
-	0xff, 0x00, 0x00, 0x00, 0x3e, 0x07, 0x3f, 0xff, 0x00, 0x00, 0x06, 0x3e, 0x07, 0x3f, 0xff, 0x08, 
-	0x00, 0x1e, 0x3e, 0x00, 0x00, 0xff, 0x8e, 0x00, 0x7e, 0x3f, 0x00, 0x00, 0x7f, 0x8f, 0x80, 0xfe, 
-	0x3f, 0x80, 0x00, 0x3f, 0x8f, 0xc0, 0x1e, 0x3f, 0xc0, 0x00, 0x0f, 0x8f, 0x00, 0x06, 0x3f, 0xe0, 
-	0x00, 0x0f, 0x0c, 0x00, 0x02, 0x3f, 0xff, 0x38, 0x0f, 0x00, 0x00, 0x00, 0x3f, 0xff, 0x38, 0x0f, 
-	0x00, 0x00, 0x00, 0x3f, 0xff, 0x38, 0x0f, 0x00, 0x00, 0x00, 0x1e, 0x00, 0x00, 0x0e, 0x00, 0x00, 
-	0x01, 0x1e, 0x00, 0x00, 0x1e, 0x10, 0x00, 0x03, 0x8e, 0x00, 0x00, 0x3c, 0x30, 0x00, 0x07, 0x8e, 
-	0x00, 0x00, 0x7c, 0x78, 0x00, 0x07, 0xc6, 0x00, 0x00, 0xf8, 0x78, 0x00, 0x0f, 0xc3, 0xff, 0x1f, 
-	0xf0, 0xfc, 0x00, 0x0f, 0xe1, 0xff, 0x1f, 0xe0, 0xfe, 0x00, 0x00, 0x00, 0x7f, 0x1f, 0x80, 0x00, 
-	0x00, 0x00, 0x00, 0x1f, 0xfe, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0xe0, 0x0c, 0x00, 0x00, 0x00, 
-	0x07, 0x00, 0x00, 0x3c, 0x00, 0x00, 0x00, 0x07, 0xc0, 0x00, 0x7c, 0x00, 0x00, 0x00, 0x07, 0xc0, 
-	0x00, 0xfc, 0x00, 0x00, 0x00, 0x07, 0x83, 0xf0, 0x3c, 0x00, 0x00, 0x00, 0x04, 0x01, 0xf0, 0x0c, 
-	0x00, 0x00, 0x00, 0x00, 0x01, 0xe0, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0xe0, 0x00, 0x00, 0x00, 
-	0x00, 0x00, 0x00, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00
+  const unsigned char epd_bitmap_logo[] PROGMEM = {
+    0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0xe0, 0x00, 0x00, 0x00, 0x00, 0x04, 0x01, 0xe0,
+    0x0c, 0x00, 0x00, 0x00, 0x07, 0x03, 0xf0, 0x3c, 0x00, 0x00, 0x00, 0x07, 0x83, 0xf8, 0x7c, 0x00,
+    0x00, 0x00, 0x07, 0xc0, 0x00, 0xfc, 0x00, 0x00, 0x00, 0x07, 0x80, 0x00, 0x7c, 0x00, 0x00, 0x00,
+    0x06, 0x00, 0x00, 0x1c, 0x00, 0x00, 0x00, 0x00, 0x1f, 0xfe, 0x04, 0x00, 0x00, 0x00, 0x00, 0x3f,
+    0xff, 0x80, 0x00, 0x00, 0x00, 0x00, 0xff, 0x1f, 0xe0, 0x00, 0x00, 0x0f, 0xc3, 0xff, 0x1f, 0xf0,
+    0xfc, 0x00, 0x07, 0xc7, 0xc0, 0x00, 0x38, 0xf8, 0x00, 0x07, 0x87, 0xc0, 0x00, 0x3c, 0x78, 0x00,
+    0x03, 0x8f, 0x80, 0x00, 0x3c, 0x38, 0x00, 0x01, 0x0f, 0x00, 0x00, 0x3e, 0x30, 0x00, 0x00, 0x1e,
+    0x00, 0x00, 0x3e, 0x00, 0x00, 0x00, 0x3e, 0x07, 0x3f, 0xff, 0x00, 0x00, 0x00, 0x3e, 0x07, 0x3f,
+    0xff, 0x00, 0x00, 0x00, 0x3e, 0x07, 0x3f, 0xff, 0x00, 0x00, 0x06, 0x3e, 0x07, 0x3f, 0xff, 0x08,
+    0x00, 0x1e, 0x3e, 0x00, 0x00, 0xff, 0x8e, 0x00, 0x7e, 0x3f, 0x00, 0x00, 0x7f, 0x8f, 0x80, 0xfe,
+    0x3f, 0x80, 0x00, 0x3f, 0x8f, 0xc0, 0x1e, 0x3f, 0xc0, 0x00, 0x0f, 0x8f, 0x00, 0x06, 0x3f, 0xe0,
+    0x00, 0x0f, 0x0c, 0x00, 0x02, 0x3f, 0xff, 0x38, 0x0f, 0x00, 0x00, 0x00, 0x3f, 0xff, 0x38, 0x0f,
+    0x00, 0x00, 0x00, 0x3f, 0xff, 0x38, 0x0f, 0x00, 0x00, 0x00, 0x1e, 0x00, 0x00, 0x0e, 0x00, 0x00,
+    0x01, 0x1e, 0x00, 0x00, 0x1e, 0x10, 0x00, 0x03, 0x8e, 0x00, 0x00, 0x3c, 0x30, 0x00, 0x07, 0x8e,
+    0x00, 0x00, 0x7c, 0x78, 0x00, 0x07, 0xc6, 0x00, 0x00, 0xf8, 0x78, 0x00, 0x0f, 0xc3, 0xff, 0x1f,
+    0xf0, 0xfc, 0x00, 0x0f, 0xe1, 0xff, 0x1f, 0xe0, 0xfe, 0x00, 0x00, 0x00, 0x7f, 0x1f, 0x80, 0x00,
+    0x00, 0x00, 0x00, 0x1f, 0xfe, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0xe0, 0x0c, 0x00, 0x00, 0x00,
+    0x07, 0x00, 0x00, 0x3c, 0x00, 0x00, 0x00, 0x07, 0xc0, 0x00, 0x7c, 0x00, 0x00, 0x00, 0x07, 0xc0,
+    0x00, 0xfc, 0x00, 0x00, 0x00, 0x07, 0x83, 0xf0, 0x3c, 0x00, 0x00, 0x00, 0x04, 0x01, 0xf0, 0x0c,
+    0x00, 0x00, 0x00, 0x00, 0x01, 0xe0, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0xe0, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00
   };
 
   display.drawBitmap(x, y, epd_bitmap_logo, 50, 50, GxEPD_RED);
