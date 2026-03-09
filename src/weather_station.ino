@@ -11,6 +11,7 @@
 
 #include "weather.h"
 #include "draw.h"
+#include "credentials.h"
 
 #define ENABLE_GxEPD2_GFX 0
 #define CS_PIN (5)
@@ -22,17 +23,12 @@ const int defaultTimeSleepM = 60;
 const int errorSleepTimeM = 10;
 const int nightSleepTimeM = 480;  // 8 hours
 
-const char* ssid = "WIFI_SSID";
-const char* password = "WIFI_PASSWORD";
-
+// time config
 const char* ntpServer = "pool.ntp.org";
-const long  gmtOffset_sec = -3 * 3600;   // Brazil (UTC-3)
-
-const char* openWeatherAPIKey = "OPEN_WEATHER_API_KEY";
-const char* unirateAPIKey = "UNIRATE_API_KEY";
+const long gmtOffset_sec = -3 * 3600;  // Brazil (UTC-3)
 
 const char* openWeatherServerName = "api.openweathermap.org";
-// Longitude and Latitude is set for Curitiba-PR
+// Longitude and Latitude are set for Curitiba-PR
 const char* weatherUri = "/data/2.5/weather?lon=-49.2908&lat=-25.504&units=metric&lang=pt_br&appid=";
 const char* forecastUri = "/data/2.5/forecast?lon=-49.2908&lat=-25.504&cnt=4&units=metric&lang=pt_br&appid=";
 
